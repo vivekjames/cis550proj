@@ -1,9 +1,9 @@
 {
-    "rds_host": "database-450.czfp5zjgdnhh.us-east-1.rds.amazonaws.com",
+    "rds_host": "finalprojectdb.czfp5zjgdnhh.us-east-1.rds.amazonaws.com",
     "rds_port": "3306",
     "rds_user": "mariatu",
-    "rds_password" : "cis550*poggers",
-    "rds_db": "FIFA",
+    "rds_password" : "*cis550*",
+    "rds_db": "SPOTIFYDATA",
     "server_host": "127.0.0.1",
     "server_port":"8080"
 
