@@ -81,6 +81,14 @@ const getRecsCharts = async (trackname, artistname) => {
    })
    return res.json()
 }
+
+//Route 10
+const getTopGenre = async () => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/analysis/topGenre`, {
+       method: 'GET',
+   })
+   return res.json()
+}
  
  
  
@@ -92,11 +100,15 @@ const getRecsCharts = async (trackname, artistname) => {
  
 export {
    getAvg,
-	getUserData, getmaxWeeks, getavgPeakRankGenre,
-getRecsUserInput,
+	getUserData, 
+   getmaxWeeks, 
+   getavgPeakRankGenre,
+   getRecsUserInput,
    getRecsDegrees,
    getRecsCharts,
-userpopularTracks,
-getSongChars
+   userpopularTracks,
+   getSongChars, 
+   getTopGenre
+   
  
 }

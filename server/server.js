@@ -13,7 +13,7 @@ app.use(cors({
 }));
  
 // Route 1 - register as GET 
-app.get('/analysis/getAvg', routes.maxWeeks)
+app.get('/analysis/getAvg', routes.getAvg)
  
 // Route 2 - register as GET
 app.get('/trends/maxWeeks', routes.maxWeeks)
@@ -25,7 +25,7 @@ app.get('/trends/avgPeakRankGenre', routes.avgPeakRankGenre)
 app.get('/trends/songChars', routes.songChars)
  
 // Route 5 - register as GET 
-app.get('/analysis/userData', routes.maxWeeks)
+app.get('/analysis/userData', routes.userData)
  
 // Route 6 - register as GET
 app.get('/recs/userinput', routes.recs_userinputs)
@@ -41,6 +41,9 @@ app.get('/recs/degrees', routes.recs_degree)
  
 // Route 9 - register as GET
 app.get('/recs/charts', routes.recs_charts)
+
+//route 10 - register as GET
+app.get('/analysis/topGenre', routes.topGenre)
  
  
  

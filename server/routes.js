@@ -279,6 +279,25 @@ async function recs_charts(req, res) {
        }
    });
 }
+
+// Route 10 
+async function topGenre(req, res) {
+    connection.query(`
+   SELECT Genre, MAX(mygenre) as TopGenre
+FROM (SELECT Genre, COUNT(Genre) mygenre
+FROM userInput
+GROUP BY Genre) as g1`
+   , function (error, results, fields) {
+ 
+       if (error) {
+           console.log(error)
+           res.json({ error: error })
+       } else if (results) {
+           res.json({ results: results })
+       }
+   });
+}
+
  
  
  
@@ -286,7 +305,7 @@ async function recs_charts(req, res) {
  
  
 module.exports = {
-getAvg, 
+   getAvg, 
    maxWeeks,
    avgPeakRankGenre,
    songChars,
@@ -295,6 +314,7 @@ getAvg,
    recs_userinputs,
    recs_degree,
    recs_charts,
+   topGenre
 
 
  
