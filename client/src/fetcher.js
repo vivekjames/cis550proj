@@ -1,6 +1,37 @@
 import config from './config.json'
-
-
+ 
+//Route 1
+const getAvg = async (attribute) => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/analysis/getAvg?page=${attribute}`, {
+       method: 'GET',
+   })
+   return res.json()
+}
+ 
+//route 2
+const getmaxWeeks = async () => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/maxWeeks`, {
+       method: 'GET',
+   })
+   return res.json()
+}
+ 
+//route 3
+const getavgPeakRankGenre = async () => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/avgPeakRankGenre`, {
+       method: 'GET',
+   })
+   return res.json()
+}
+ 
+//route 4
+const getSongChars = async (char1, char2, threshold1, threshold2) => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/songChars?char1=${char1}&char2=${char2}&threshold1=${threshold1}&threshold2=${threshold2}`, {
+       method: 'GET',
+   })
+   return res.json()
+}
+ 
 const test = async () => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/testing`, {
         method: 'GET',
@@ -16,69 +47,84 @@ const login = async () => {
     return res.json()
 }
 
-
-const getAllMatches = async (page, pagesize, league) => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/matches/${league}?page=${page}&pagesize=${pagesize}`, {
+//route 5
+const getUserData = async () => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/analysis/userData`, {
         method: 'GET',
     })
     return res.json()
+ }
+ 
+ 
+ 
+ 
+//Route 6
+const getRecsUserInput = async (energy, genre, acoustic, dance, minyear, maxyear) => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/userinput?energy=${energy}&
+   genre=${genre}&acoustic=${acoustic}&dance=${dance}&minyear=${minyear}&maxyear=${maxyear}`, {
+       method: 'GET',
+   })
+   return res.json()
+}
+ 
+ 
+//route 7 
+const userpopularTracks = async () => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/userpopularTracks`, {
+       method: 'GET',
+   })
+   return res.json()
+}
+ 
+ 
+//Route 8
+const getRecsDegrees = async (trackname, artistname) => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/degrees?trackname=${trackname}&
+   artistname=${artistname}`, {
+       method: 'GET',
+   })
+   return res.json()
+}
+ 
+ 
+//Route 9
+const getRecsCharts = async (trackname, artistname) => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/charts?trackname=${trackname}&
+   artistname=${artistname}`, {
+       method: 'GET',
+   })
+   return res.json()
 }
 
-const getAllPlayers = async (page, pagesize) => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/players?page=${page}&pagesize=${pagesize}`, {
-        method: 'GET',
-    })
-    return res.json()
+//Route 10
+const getTopGenre = async () => {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/analysis/topGenre`, {
+       method: 'GET',
+   })
+   return res.json()
 }
-
-const getMatch = async (id) => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/match?id=${id}`, {
-        method: 'GET',
-    })
-    return res.json()
-}
-
-const getPlayer = async (id) => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/player?id=${id}`, {
-        method: 'GET',
-    })
-    return res.json()
-}
-
-const getMatchSearch = async (home, away, page, pagesize) => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/search/matches?Home=${home}&Away=${away}&page=${page}&pagesize=${pagesize}`, {
-        method: 'GET',
-    })
-    return res.json()
-}
-
-const getPlayerSearch = async (name, nationality, club, rating_high, rating_low, pot_high, pot_low, page, pagesize) => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/search/players?Name=${name}&Nationality=${nationality}&Club=${club}&RatingLow=${rating_low}&RatingHigh=${rating_high}&PotentialHigh=${pot_high}&PotentialLow=${pot_low}&page=${page}&pagesize=${pagesize}`, {
-        method: 'GET',
-    })
-    return res.json()
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 export {
     test,
     login,
-
-    getAllMatches,
-    getAllPlayers,
-    getMatch,
-    getPlayer,
-    getMatchSearch,
-    getPlayerSearch
+    getAvg,
+    getUserData, 
+   getmaxWeeks, 
+   getavgPeakRankGenre,
+   getRecsUserInput,
+   getRecsDegrees,
+   getRecsCharts,
+   userpopularTracks,
+   getSongChars, 
+   getTopGenre
+   
+ 
 }

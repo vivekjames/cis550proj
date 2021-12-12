@@ -1,309 +1,321 @@
 const config = require('./config.json')
 const mysql = require('mysql');
 const e = require('express');
-
+ 
 // TODO: fill in your connection details here
 const connection = mysql.createConnection({
-    host: config.rds_host,
-    user: config.rds_user,
-    password: config.rds_password,
-    port: config.rds_port,
-    database: config.rds_db
+   host: config.rds_host,
+   user: config.rds_user,
+   password: config.rds_password,
+   port: config.rds_port,
+   database: config.rds_db
 });
 connection.connect();
-
-
-// Route 1 (handler)
-async function hello(req, res) {
-    // a GET request to /hello?name=Steve
-    if (req.query.name) {
-        res.send(`Hello, ${req.query.name}! Welcome to the FIFA server!`)
-    } else {
-        res.send(`Hello! Welcome to the FIFA server!`)
-    }
-}
-
-
-// Route 2 (handler)
-async function jersey(req, res) {
-    const colors = ['red', 'blue']
-    const jersey_number = Math.floor(Math.random() * 20) + 1
-    const name = req.query.name ? req.query.name : "player"
-
-    if (req.params.choice === 'number') {
-        // TODO: TASK 1: inspect for issues and correct 
-        res.json({ message: `Hello, ${name}!`, jersey_number: jersey_number })
-    } else if (req.params.choice === 'color') {
-        var lucky_color_index = Math.floor(Math.random() * 2);
-        // TODO: TASK 2: change this or any variables above to return only 'red' or 'blue' at random (go Quakers!)
-        res.json({ message: `Hello, ${name}!`, jersey_color: colors[lucky_color_index] })
-    } else {
-        // TODO: TASK 3: inspect for issues and correct
-        res.json({ message: `Hello, ${name}, we like your jersey!` })
-    }
-}
-
-// Route 3 (handler)
-async function all_matches(req, res) {
-    // TODO: TASK 4: implement and test, potentially writing your own (ungraded) tests
-    // We have partially implemented this function for you to 
-    // parse in the league encoding - this is how you would use the ternary operator to set a variable to a default value
-    // we didn't specify this default value for league, and you could change it if you want! 
-    // in reality, league will never be undefined since URLs will need to match matches/:league for the request to be routed here... 
-    const league = req.params.league ? req.params.league : 'D1'
-    // use this league encoding in your query to furnish the correct results
-
-    if (req.query.page && !isNaN(req.query.page)) {
-        // This is the case where page is defined.
-        // The SQL schema has the attribute OverallRating, but modify it to match spec! 
-        // TODO: query and return results here:
-        const pagesize = req.query.pagesize ? req.query.pagesize : 10
-        const start = (req.query.page - 1) * pagesize
-        connection.query(`SELECT MatchId, Date, Time, HomeTeam AS Home, AwayTeam AS Away, FullTimeGoalsH AS HomeGoals, FullTimeGoalsA AS AwayGoals  
-        FROM Matches 
-        WHERE Division = '${league}'
-        ORDER BY HomeTeam, AwayTeam
-        LIMIT ${start}, ${pagesize}`, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            }
-        });
-
-    } else {
-        // we have implemented this for you to see how to return results by querying the database
-        connection.query(`SELECT MatchId, Date, Time, HomeTeam AS Home, AwayTeam AS Away, FullTimeGoalsH AS HomeGoals, FullTimeGoalsA AS AwayGoals  
-        FROM Matches 
-        WHERE Division = '${league}'
-        ORDER BY HomeTeam, AwayTeam`, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            }
-        });
-    }
-}
-
-// Route 4 (handler)
-async function all_players(req, res) {
-    // TODO: TASK 5: implement and test, potentially writing your own (ungraded) tests
-
-    if (req.query.page && !isNaN(req.query.page)) {
-        // This is the case where page is defined.
-        // The SQL schema has the attribute OverallRating, but modify it to match spec! 
-        // TODO: query and return results here:
-        const pagesize = req.query.pagesize ? req.query.pagesize : 10
-        const start = (req.query.page - 1) * pagesize
-        connection.query(`SELECT PlayerId, Name, Nationality, OverallRating AS Rating, Potential, Club, Value
-        FROM Players
-        ORDER BY Name
-        LIMIT ${start}, ${pagesize}`, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            }
-        });
-
-    } else {
-        // we have implemented this for you to see how to return results by querying the database
-        connection.query(`SELECT PlayerId, Name, Nationality, OverallRating AS Rating, Potential, Club, Value
-        FROM Players
-        ORDER BY Name`, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            }
-        });
-    }
-}
-
-// Route 5 (handler)
-async function match(req, res) {
-    // TODO: TASK 6: implement and test, potentially writing your own (ungraded) tests
-    if (req.query.id && !isNaN(req.query.id)) {
-        connection.query(`SELECT MatchId, Date, Time, HomeTeam AS Home, AwayTeam AS Away, FullTimeGoalsH as HomeGoals, FullTimeGoalsA as AwayGoals, HalfTimeGoalsH as HTHomeGoals, HalfTimeGoalsA as HTAwayGoals, ShotsH as ShotsHome, ShotsA as ShotsAway, ShotsOnTargetH as ShotsOnTargetHome, ShotsOnTargetA as ShotsOnTargetAway, FoulsH as FoulsHome, FoulsA as FoulsAway, CornersH as CornersHome, CornersA as CornersAway, YellowCardsH as YCHome, YellowCardsA as YCAway, RedCardsH as RCHome, RedCardsA as RCAway
-        FROM Matches
-        WHERE MatchId = '${req.query.id}'`, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            } else {
-                results = [];
-                res.json({ results: results })
-            }
-        });
-    } else {
-        results = [];
-        return res.json({ results: results })
-    }
-
-}
-
-// Route 6 (handler)
-async function player(req, res) {
-    // TODO: TASK 7: implement and test, potentially writing your own (ungraded) tests
-    if (req.query.id && !isNaN(req.query.id)) {
-        var best_position = ''
-        connection.query(`SELECT BestPosition
-        FROM Players
-        WHERE PlayerId = '${req.query.id}'`, function (error, results, fields) {
-            if (results[0].BestPosition == 'GK') {
-                connection.query(`SELECT PlayerId, Name, Age, Photo, Nationality, Flag, OverallRating as Rating, Potential, Club, ClubLogo, Value, Wage, InternationalReputation, Skill, JerseyNumber, ContractValidUntil, Height, Weight, BestPosition, BestOverallRating, ReleaseClause, GKPenalties, GKDiving, GKHandling, GKKicking,
-                GKPositioning, GKReflexes
-                FROM Players
-                WHERE PlayerId = '${req.query.id}'`, function (error, results, fields) {
-    
-                    if (error) {
-                        console.log(error)
-                        res.json({ error: error })
-                    } else if (results) {
-                        res.json({ results: results })
-                    } else {
-                        results = [];
-                        res.json({ results: results })
-                    }
-                });
-            } else {
-                connection.query(`SELECT PlayerId, Name, Age, Photo, Nationality, Flag, OverallRating as Rating, Potential, Club, ClubLogo, Value, Wage, InternationalReputation, Skill, JerseyNumber, ContractValidUntil, Height, Weight, BestPosition, BestOverallRating, ReleaseClause, NPassing, NBallControl, NAdjustedAgility, NStamina, NStrength, NPositioning
-                FROM Players
-                WHERE PlayerId = '${req.query.id}'`, function (error, results, fields) {
-    
-                    if (error) {
-                        console.log(error)
-                        res.json({ error: error })
-                    } else if (results) {
-                        res.json({ results: results })
-                    } else {
-                        results = [];
-                        res.json({ results: results })
-                    }
-                });
-            }
-        });
-
-    } else {
-        results = [];
-        return res.json({ results: results })
-    }
-}
-
-// Route 7 (handler)
-async function search_matches(req, res) {
-    // TODO: TASK 8: implement and test, potentially writing your own (ungraded) tests
-    // IMPORTANT: in your SQL LIKE matching, use the %query% format to match the search query to substrings, not just the entire string
-    if (req.query.page && !isNaN(req.query.page)) {
-        // This is the case where page is defined.
-        // The SQL schema has the attribute OverallRating, but modify it to match spec! 
-        // TODO: query and return results here:
-        const pagesize = req.query.pagesize ? req.query.pagesize : 10
-        const start = (req.query.page - 1) * pagesize
-        connection.query(`SELECT MatchId, Date, Time, HomeTeam AS Home, AwayTeam AS Away, FullTimeGoalsH AS HomeGoals, FullTimeGoalsA AS AwayGoals  
-        FROM Matches 
-        WHERE HomeTeam LIKE '%${req.query.Home}%' AND AwayTeam LIKE '%${req.query.Away}%'
-        ORDER BY HomeTeam, AwayTeam
-        LIMIT ${start}, ${pagesize}`, function (error, results, fields) {
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            } else {
-                res.json({ results: results })
-            }
-        });
-    } else {
-        // we have implemented this for you to see how to return results by querying the database
-        connection.query(`SELECT MatchId, Date, Time, HomeTeam AS Home, AwayTeam AS Away, FullTimeGoalsH AS HomeGoals, FullTimeGoalsA AS AwayGoals  
-        FROM Matches 
-        WHERE HomeTeam LIKE '%${req.query.Home}%' AND AwayTeam LIKE '%${req.query.Away}%'
-        ORDER BY HomeTeam, AwayTeam`, function (error, results, fields) {
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            } else {
-                res.json({ results: results })
-            }
-        });
-    }
-
-}
-
-// Route 8 (handler)
-async function search_players(req, res) {
-    // TODO: TASK 9: implement and test, potentially writing your own (ungraded) tests
-    // IMPORTANT: in your SQL LIKE matching, use the %query% format to match the search query to substrings, not just the entire string
-    
-    if (req.query.page && !isNaN(req.query.page)) {
-        // This is the case where page is defined.
-        // The SQL schema has the attribute OverallRating, but modify it to match spec! 
-        // TODO: query and return results here:
-        const pagesize = req.query.pagesize ? req.query.pagesize : 10
-        const RatingLow = req.query.RatingLow ? req.query.RatingLow : 0
-        const RatingHigh = req.query.RatingHigh ? req.query.RatingHigh : 100
-        const PotentialLow = req.query.PotentialLow ? req.query.PotentialLow : 0
-        const PotentialHigh = req.query.PotentialHigh ? req.query.PotentialHigh : 100
-        const start = (req.query.page - 1) * pagesize
-        connection.query(`SELECT PlayerId, Name, Nationality, OverallRating AS Rating, Potential, Club, Value
-        FROM Players
-        WHERE Name LIKE '%${req.query.Name}%' AND Nationality LIKE '%${req.query.Nationality}%' AND Club LIKE 
-        '%${req.query.Club}%' AND OverallRating >= ${RatingLow} AND OverallRating <= ${RatingHigh} AND Potential >= ${PotentialLow} AND Potential <= ${PotentialHigh}
-        ORDER BY Name
-        LIMIT ${start}, ${pagesize}`, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            }
-        });
  
-    } else {
-        // we have implemented this for you to see how to return results by querying the database
-        const RatingLow = req.query.RatingLow ? req.query.RatingLow : 0
-        const RatingHigh = req.query.RatingHigh ? req.query.RatingHigh : 100
-        const PotentialLow = req.query.PotentialLow ? req.query.PotentialLow : 0
-        const PotentialHigh = req.query.PotentialHigh ? req.query.PotentialHigh : 100
-        connection.query(`SELECT PlayerId, Name, Nationality, OverallRating AS Rating, Potential, Club, Value
-        FROM Players
-        WHERE Name LIKE '%${req.query.Name}%' AND Nationality LIKE '%${req.query.Nationality}%' AND Club LIKE 
-        '%${req.query.Club}%' AND OverallRating >= ${RatingLow} AND OverallRating <= ${RatingHigh} AND Potential >= ${PotentialLow} AND Potential <= ${PotentialHigh}
-        ORDER BY Name`, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            }
-        });
-    }
+//Route 1
+async function getAvg(req, res){
+    const attrb = req.query.attribute
+    connection.query('SELECT AVG(${attrb}) AS avg, MIN(${attrb}) as min, MAX(${attrb}) as max FROM userInput;',
+    function (error, results, fields){
+        if(error) {
+            console.log(error)
+        } else if (results){
+            res.json({results: results})
+        }
+    });
+ }
+ 
+ 
+ 
+// Route 2 (handler)
+async function maxWeeks(req, res) {
+  
+       connection.query(`
+       SELECT C.TrackName, C.TrackArtist, C.WeeksOnBoard
+       FROM Charts C, SamplePlaylist S
+       WHERE C.TrackName = S.Song
+       AND C.TrackArtist = S.Artist
+       ORDER BY WeeksOnBoard DESC LIMIT 1;`
+       , function (error, results, fields) {
+ 
+           if (error) {
+               console.log(error)
+               res.json({ error: error })
+           } else if (results) {
+               res.json({ results: results })
+           }
+       });
+}
+ 
+ 
+ 
+//route 3
+ 
+async function avgPeakRankGenre(req, res) {
+  
+   connection.query(`
+   WITH TrackGenres as (
+       SELECT T.Genre, S.Song, S.Artist
+       FROM Tracks T JOIN SamplePlaylist S ON T.TrackId = S.TrackId
+   )
+   SELECT AVG(PeakRank) as AvgPeakRank, Genre
+   FROM Charts C, TrackGenres T
+   WHERE C.TrackName = T.Song AND C.TrackArtist = T.Artist
+   GROUP BY Genre
+   ORDER BY AVG(PeakRank) ASC;`
+   , function (error, results, fields) {
+ 
+       if (error) {
+           console.log(error)
+           res.json({ error: error })
+       } else if (results) {
+           res.json({ results: results })
+       }
+   });
+}
+ 
+//route 4
+async function songChars(req, res) {
+ 
+   const char1 = req.query.char1 ? req.query.char1 : 'Danceability';
+   const char2 = req.query.char1 ? req.query.char1 : 'Energy';
+   const threshold1 = req.query.threshold1 ? req.query.threshold1 : '0.5';
+   const threshold2 = req.query.threshold2 ? req.query.threshold2 : '0.5';
+ 
+ 
+ 
+ 
+       connection.query(`WITH DanceArtists as (
+           select TrackArtist, AVG(PeakRank) as AVGPeak, AVG(WeeksOnBoard) as AVGWeeks, Avg(Danceability) as AVGChar2
+           FROM Charts C join Tracks T on C.TrackName = T.TrackName
+           WHERE TrackArtist in (SELECT Artist FROM SamplePlaylist)
+           GROUP BY TrackArtist
+           HAVING Avg(${char1}) > ${threshold1}
+       ),
+       EnergyArtists as (
+           select TrackArtist, AVG(PeakRank) as AVGPeak, AVG(WeeksOnBoard) as AVGWeeks, Avg(Energy) as AVGChar1
+           FROM Charts C join Tracks T on C.TrackName = T.TrackName
+           WHERE TrackArtist in (SELECT Artist FROM SamplePlaylist)
+           GROUP BY TrackArtist
+           HAVING Avg(${char2}) > ${threshold2}
+       )
+       SELECT D.AVGPeak, D.AVGWeeks, E.AVGChar1, D.AVGChar2, D.TrackArtist
+       FROM DanceArtists D JOIN EnergyArtists E ON D.TrackArtist = E.TrackArtist
+       GROUP BY D.TrackArtist
+       ORDER BY D.AVGPeak ASC, D.AVGWeeks DESC;`, function (error, results, fields) {
+ 
+           if (error) {
+               console.log(error)
+               res.json({ error: error })
+           } else if (results) {
+               res.json({ results: results })
+           }
+       });
+ 
+  
+}
+ 
+//Route 5
+async function userData (req, res){
+   connection.query(`CREATE VIEW userInput AS
+       SELECT *
+       FROM UserSongs
+       JOIN Tracks
+       ON UserSongs.TrackId = Tracks.TrackId;`, function (error, results, fields){
+           if(error){
+               console.log(error)
+               res.json({error: error})
+ 
+           } else if (results){
+               res.json({results : results})
+           }
+       });
+}
+ 
+// Route 6 (handler)
+async function recs_userinputs(req, res) {
+   const energy = req.query.energy;
+   const genre = req.query.genre;
+   const acoustic = req.query.acoustic;
+   const dance = req.query.dance;
+   const min_year = req.query.minyear;
+   const max_year = req.query.maxyear;
+ 
+   connection.query(`
+   SELECT DISTINCT t1.TrackName, t1.ArtistName
+   FROM
+   (SELECT TrackName, TrackId, ArtistName
+   FROM Tracks
+   WHERE Energy >= ${energy} AND Genre = '${genre}' AND Acousticness >= ${acoustic}
+   AND Danceability >= ${dance}) t1
+   INNER JOIN
+   (SELECT TrackName, TrackArtist
+   FROM Charts
+   WHERE Date >= ${min_year} AND Date <= ${max_year}
+   ) t2
+   ON t1.TrackName = t2.TrackName AND t1.ArtistName = t2.TrackArtist
+   LIMIT 10`, function (error, results, fields) {
+ 
+       if (error) {
+           console.log(error)
+           res.json({ error: error })
+       } else if (results) {
+           res.json({ results: results })
+       }
+   });
+}
+ 
+//route 7
+ 
+async function userpopularTracks(req, res) {
+  
+   connection.query(`
+   SELECT Charts1.TrackName as Track, Charts1.TrackArtist as Artist, PeakRank, Popularity
+  FROM (SELECT DISTINCT TRACKName, TRACKArtist, MIN(PeakRank) as PeakRank
+  FROM Charts
+  Group By TRACKName, TRACKArtist
+  ) Charts1
+  INNER JOIN
+  (SELECT TrackName, ArtistName, Popularity
+  FROM userInput
+  ) usertracks
+  ON Charts1.TRACKName = usertracks.TrackName AND Charts1.TRACKArtist = usertracks.ArtistName
+  ORDER BY PeakRank;`
+   , function (error, results, fields) {
+ 
+       if (error) {
+           console.log(error)
+           res.json({ error: error })
+       } else if (results) {
+           res.json({ results: results })
+       }
+   });
+}
+ 
+ 
+// Route 8 (handler)
+async function recs_degree(req, res) {
+  
+   const track_name = req.query.trackname
+   const artist_name = req.query.artistname
+   connection.query(`
+       WITH selected_song as (
+       SELECT TrackId, Energy, Genre
+           FROM Tracks
+           WHERE Tracks.TrackName = '${track_name}' and Tracks.ArtistName = '${artist_name}'),
+            one_degree(name, id, n, energy, artistname) as (
+                SELECT Tracks.TrackName, Tracks.TrackId, 1 as n, Tracks.Energy, Tracks.ArtistName
+                FROM Tracks, selected_song
+                WHERE Tracks.Genre = selected_song.GENRE AND Tracks.TrackName <> '${track_name}' AND Tracks.Energy = selected_song.Energy
+            ),
+           two_degree(name, id, n, energy, artistname) as (
+              SELECT Tracks.TrackName, Tracks.TrackId, 2 as n, Tracks.Energy, Tracks.ArtistName
+                FROM Tracks, selected_song
+                WHERE Tracks.Genre = selected_song.GENRE AND Tracks.TrackName <> '${track_name}' AND
+                      Tracks.Energy < selected_song.Energy + 0.005 AND Tracks.Energy > selected_song.Energy - 0.005
+                       AND Tracks.TrackId NOT IN (SELECT id FROM one_degree)
+            ),
+           three_degree(name, id, n, energy, artistname) as (
+                SELECT Tracks.TrackName, Tracks.TrackId, 3 as n, Tracks.Energy, Tracks.ArtistName
+                FROM Tracks, selected_song
+                WHERE Tracks.Genre = selected_song.GENRE AND Tracks.TrackName <> '${track_name}' AND
+                      Tracks.Energy < selected_song.Energy + 0.008 AND Tracks.Energy > selected_song.Energy - 0.008
+                       AND Tracks.TrackId NOT IN (SELECT id FROM one_degree)
+                       AND Tracks.TrackId NOT IN (SELECT id FROM two_degree)
+            )
+           SELECT artistname, name, id, n, energy
+           FROM one_degree
+           UNION
+           SELECT artistname, name, id, n, energy
+           FROM two_degree
+           UNION
+           SELECT artistname, name, id, n, energy
+           FROM three_degree
+           ORDER BY n ASC;`, function (error, results, fields) {
+ 
+       if (error) {
+           console.log(error)
+           res.json({ error: error })
+       } else if (results) {
+           res.json({ results: results })
+       }
+   });
+}
+ 
+ 
+// Route 9 (handler)
+async function recs_charts(req, res) {
+  
+   const track_name = req.query.trackname
+   const artist_name = req.query.artistname
+   connection.query(`
+   WITH selected_song as (
+       SELECT Genre
+           FROM Tracks
+           WHERE Tracks.TrackName = '${track_name}' and Tracks.ArtistName = '${artist_name}'),
+           billboard_date(date) as (
+               SELECT Charts.Date
+               FROM Charts
+               WHERE Charts.TrackName = '${track_name}' and Charts.TrackArtist = '${artist_name}'
+               ORDER BY Charts.Date ASC
+               LIMIT 1
+           ),
+           billboard_songs(name, artist, trackrank) as (
+               SELECT Charts.TrackName, Charts.TrackArtist, Charts.TrackRank
+               FROM Charts, billboard_date
+               WHERE Charts.Date = billboard_date.date
+           )
+           SELECT DISTINCT billboard_songs.name, billboard_songs.artist, billboard_songs.trackrank
+           FROM Tracks
+           JOIN billboard_songs ON billboard_songs.name = Tracks.TrackName AND billboard_songs.artist = Tracks.ArtistName
+           JOIN selected_song ON Tracks.Genre = selected_song.Genre
+           ORDER BY billboard_songs.trackrank ASC;`, function (error, results, fields) {
+ 
+       if (error) {
+           console.log(error)
+           res.json({ error: error })
+       } else if (results) {
+           res.json({ results: results })
+       }
+   });
 }
 
+// Route 10 
+async function topGenre(req, res) {
+    connection.query(`
+   SELECT Genre, MAX(mygenre) as TopGenre
+FROM (SELECT Genre, COUNT(Genre) mygenre
+FROM userInput
+GROUP BY Genre) as g1`
+   , function (error, results, fields) {
+ 
+       if (error) {
+           console.log(error)
+           res.json({ error: error })
+       } else if (results) {
+           res.json({ results: results })
+       }
+   });
+}
+
+ 
+ 
+ 
+ 
+ 
+ 
 module.exports = {
-    hello,
-    jersey,
-    all_matches,
-    all_players,
-    match,
-    player,
-    search_matches,
-    search_players
+   getAvg, 
+   maxWeeks,
+   avgPeakRankGenre,
+   songChars,
+    userData, 
+   userpopularTracks,
+   recs_userinputs,
+   recs_degree,
+   recs_charts,
+   topGenre
+
+
+ 
 }

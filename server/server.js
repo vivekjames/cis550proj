@@ -5,8 +5,8 @@ const mysql = require('mysql');
 const routes = require('./routes')
 const config = require('./config.json')
 const cors = require('cors');
-
-
+ 
+ 
 const app = express();
 /*app.use(cors({
     origin: '*'
@@ -50,35 +50,43 @@ app.get('/callback', function (req, res) {
 });
 
 // Route 1 - register as GET 
-app.get('/hello', routes.hello)
-
-// Route 2 - register as GET 
-app.get('/jersey/:choice', routes.jersey)
-
-// Route 3 - register as GET 
-app.get('/matches/:league', routes.all_matches)
-
-// Route 4 - register as GET 
-app.get('/players', routes.all_players)
-
+app.get('/analysis/getAvg', routes.getAvg)
+ 
+// Route 2 - register as GET
+app.get('/trends/maxWeeks', routes.maxWeeks)
+ 
+// Route 3 - register as GET
+app.get('/trends/avgPeakRankGenre', routes.avgPeakRankGenre)
+ 
+// Route 4 - register as GET
+app.get('/trends/songChars', routes.songChars)
+ 
 // Route 5 - register as GET 
-app.get('/match', routes.match)
+app.get('/analysis/userData', routes.userData)
+ 
+// Route 6 - register as GET
+app.get('/recs/userinput', routes.recs_userinputs)
+ 
+ 
+//route 7
+app.get('/trends/userpopularTracks', routes.userpopularTracks)
+ 
+ 
+ 
+// Route 8 - register as GET
+app.get('/recs/degrees', routes.recs_degree)
+ 
+// Route 9 - register as GET
+app.get('/recs/charts', routes.recs_charts)
 
-// Route 6 - register as GET 
-app.get('/player', routes.player)
-
-// Route 7 - register as GET 
-app.get('/search/matches', routes.search_matches)
-
-// Route 8 - register as GET 
-app.get('/search/players', routes.search_players)
-
-
-
-
-
+//route 10 - register as GET
+app.get('/analysis/topGenre', routes.topGenre)
+ 
+ 
+ 
+ 
 app.listen(config.server_port, () => {
-    console.log(`Server running at http://${config.server_host}:${config.server_port}/`);
+   console.log(`Server running at http://${config.server_host}:${config.server_port}/`);
 });
-
+ 
 module.exports = app;
