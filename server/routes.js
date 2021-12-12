@@ -14,16 +14,17 @@ connection.connect();
  
 //Route 1
 async function getAvg(req, res){
-   const attrb = req.query.attribute
-   connection.query('SELECT AVG(${attrb}) AS avg FROM userInput;',
-   function (error, results, fields){
-       if(error) {
-           console.log(error)
-       } else if (results){
-           res.json({results: results})
-       }
-   });
-}
+    const attrb = req.query.attribute
+    connection.query('SELECT AVG(${attrb}) AS avg, MIN(${attrb}) as min, MAX(${attrb}) as max FROM userInput;',
+    function (error, results, fields){
+        if(error) {
+            console.log(error)
+        } else if (results){
+            res.json({results: results})
+        }
+    });
+ }
+ 
  
  
 // Route 2 (handler)
