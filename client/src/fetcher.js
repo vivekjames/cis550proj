@@ -1,5 +1,22 @@
 import config from './config.json'
 
+
+const test = async () => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/testing`, {
+        method: 'GET',
+    })
+    return res.json()
+}
+
+const login = async () => {
+    console.log("IN FETCHER")
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/login`, {
+        method: 'GET',
+    })
+    return res.json()
+}
+
+
 const getAllMatches = async (page, pagesize, league) => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/matches/${league}?page=${page}&pagesize=${pagesize}`, {
         method: 'GET',
@@ -55,6 +72,9 @@ const getPlayerSearch = async (name, nationality, club, rating_high, rating_low,
 
 
 export {
+    test,
+    login,
+
     getAllMatches,
     getAllPlayers,
     getMatch,

@@ -1,61 +1,7 @@
-import React from 'react';
-import {
-  Table,
-  Pagination,
-  Select
-} from 'antd'
+import React, {} from 'react';
 
-import MenuBar from '../components/MenuBar';
-import { getAllMatches, getAllPlayers } from '../fetcher'
-const { Column, ColumnGroup } = Table;
-const { Option } = Select;
+import { login, test } from '../fetcher'
 
-
-const playerColumns = [
-  {
-    title: 'Name',
-    dataIndex: 'Name',
-    key: 'Name',
-    sorter: (a, b) => a.Name.localeCompare(b.Name),
-    render: (text, row) => <a href={`/players?id=${row.PlayerId}`}>{text}</a>
-  },
-  {
-    title: 'Nationality',
-    dataIndex: 'Nationality',
-    key: 'Nationality',
-    sorter: (a, b) => a.Nationality.localeCompare(b.Nationality)
-  },
-  {
-    title: 'Rating',
-    dataIndex: 'Rating',
-    key: 'Rating',
-    sorter: (a, b) => a.Rating - b.Rating
-    
-  },
-  {
-    title: 'Potential',
-    dataIndex: 'Potential',
-    key: 'Potential',
-    sorter: (a, b) => a.Potential - b.Potential
-    
-  },
-  {
-    title: 'Club',
-    dataIndex: 'Club',
-    key: 'Club',
-    sorter: (a, b) => a.Club.localeCompare(b.Club)
-    
-  },
-  {
-    title: 'Value',
-    dataIndex: 'Value',
-    key: 'Value'
-    
-  }
-  // TASK 7: add a column for Potential, with the ability to (numerically) sort ,
-  // TASK 8: add a column for Club, with the ability to (alphabetically) sort 
-  // TASK 9: add a column for Value - no sorting required
-];
 
 class HomePage extends React.Component {
 
@@ -63,92 +9,67 @@ class HomePage extends React.Component {
     super(props)
 
     this.state = {
-      matchesResults: [],
-      matchesPageNumber: 1,
-      matchesPageSize: 10,
-      playersResults: [],
-      pagination: null  
+      playlistURL: "",
+
     }
-
-    this.leagueOnChange = this.leagueOnChange.bind(this)
-    this.goToMatch = this.goToMatch.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
 
-  goToMatch(matchId) {
-    window.location = `/matches?id=${matchId}`
-  }
 
-  leagueOnChange(value) {
-    // TASK 2: this value should be used as a parameter to call getAllMatches in fetcher.js with the parameters page and pageSize set to null
-    // then, matchesResults in state should be set to the results returned - see a similar function call in componentDidMount()
-    getAllMatches(null, null, value).then(res => {
-      this.setState({ matchesResults: res.results })
-    })
-    
+  handleSubmit() {
+
+    var sURL = "open.spotify.com/playlist/";
+    if (!this.state.playlistURL) {
+      alert("Empty input");
+    } //else if (!this.state.playlistURL.includes(sURL)) {
+      //alert("Not a valid Spotify playlist")
+    //} 
+    else {
+      login().then(res => {
+        console.log(res);
+        alert("Done login!");
+      })
+      var start = this.state.playlistURL.indexOf(sURL) + sURL.length;
+      var end = this.state.playlistURL.indexOf("?");
+      var playlistID = this.state.playlistURL.substring(start, end);
+
+      //window.location = `/analysis/?playlist=${playlistID}`;
+    }
   }
 
   componentDidMount() {
-    getAllMatches(null, null, 'D1').then(res => {
-      this.setState({ matchesResults: res.results })
-    })
-
-    getAllPlayers().then(res => {
-      console.log(res.results)
-      this.setState({ playersResults: res.results })
-      // TASK 1: set the correct state attribute to res.results
-    })
- 
   }
+
 
 
   render() {
 
     return (
-      <div>
-        <MenuBar />
-        <div style={{ width: '70vw', margin: '0 auto', marginTop: '5vh' }}>
-          <h3>Players</h3>
-          <Table dataSource={this.state.playersResults} columns={playerColumns} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5, showQuickJumper:true }}/>
+      <div style={{}}>
+
+        <div style={{display: 'flex', justifyContent: 'center', marginTop: '10%'}}>
+          <h1>Spotify Final Project Name</h1>
         </div>
-        <div style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }}>
-          <h3>Matches</h3>
-          <Select defaultValue="D1" style={{ width: 120 }} onChange={this.leagueOnChange}>
-            <Option value="D1">Bundesliga</Option>
-            <Option value="SP1">La Liga</Option>
-            <Option value="F1">Ligue 1</Option>
-            <Option value="I1">Serie A</Option>
-            <Option value="E0">Premier League</Option>
-             {/* TASK 3: Take a look at Dataset Information.md from MS1 and add other options to the selector here  */}
 
-          </Select>
-          
-          <Table onRow={(record, rowIndex) => {
-    return {
-      onClick: event => {this.goToMatch(record.MatchId)}, // clicking a row takes the user to a detailed view of the match in the /matches page using the MatchId parameter  
-    };
-  }} dataSource={this.state.matchesResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5, showQuickJumper:true }}>
-            <ColumnGroup title="Teams">
-              {/* TASK 4: correct the title for the 'Home' column and add a similar column for 'Away' team in this ColumnGroup */}
-              <Column title="Home" dataIndex="Home" key="Home" sorter= {(a, b) => a.Home.localeCompare(b.Home)}/>
-              <Column title="Away" dataIndex="Away" key="Away" sorter= {(a, b) => a.Away.localeCompare(b.Away)}/>
-            </ColumnGroup>
-            <ColumnGroup title="Goals">
-              {/* TASK 5: add columns for home and away goals in this ColumnGroup, with the ability to sort values in these columns numerically */}
-              <Column title="Home Goals" dataIndex="HomeGoals" key="HomeGoals" sorter= {(a, b) => a.HomeGoals - b.HomeGoals}/>
-              <Column title="Away Goals" dataIndex="AwayGoals" key="AwayGoals" sorter= {(a, b) => a.AwayGoals - b.AwayGoals}/>
-            </ColumnGroup>
-            <Column title="Date" dataIndex="Date" key="Date"/>
-            <Column title="Time" dataIndex="Time" key="Time"/>
-             {/* TASK 6: create two columns (independent - not in a column group) for the date and time. Do not add a sorting functionality */}
-          </Table>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5%' }}>
+          <h4>Analyze your Spotify playlist</h4>
+        </div>
 
+        <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', marginTop: '0%'}}>
+          <form onSubmit={this.handleSubmit} style={{alignSelf: 'center'}}>
+            <label>
+              <input type="text" name="textInput" style={{width: 400, height: 40}} onChange={(event) => this.setState({ playlistURL: event.target.value})}/>
+            </label>
+          </form>
+          <button onClick={this.handleSubmit} style={{marginLeft: 10, height: 40}}>Analyze</button>
+          <a href="https://accounts.spotify.com/authorize?response_type=code&client_id=20038c715a704136bd16ff016feeb3b9&scope=playlist-read-private&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fanalysis%2F&state=asdfghjklzxcvbnm">hi</a>
         </div>
 
 
       </div>
     )
-  }
+  } //https://accounts.spotify.com/authorize?response_type=code&client_id=20038c715a704136bd16ff016feeb3b9&scope=playlist-read-public%20playlist-read-private&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fanalysis%2F&state=state
 
 }
 
