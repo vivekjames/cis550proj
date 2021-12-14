@@ -1,13 +1,7 @@
 {
-  "short_name": "FIFA Client",
-  "name": "CIS 550 - HW2 FIFA Client",
-  "icons": [
-    {
-      "src": "football.svg",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
+  "short_name": "SpotifyWrapped450",
+  "name": "CIS 450 Final Project - SpotifyWrapped450",
+  
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",

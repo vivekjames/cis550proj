@@ -16,7 +16,6 @@ const getToken = async (code) => {
 }
 
 const addToPlaylistTable = async (track) => {
-    console.log(track)
     var res = await fetch(`http://${config.server_host}:${config.server_port}/addToPlaylistTable?track=${track}`, {
         method: 'POST',
     })
@@ -75,8 +74,7 @@ const getUserData = async () => {
  
 //Route 6
 const getRecsUserInput = async (energy, genre, acoustic, dance, minyear, maxyear) => {
-   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/userinput?energy=${energy}&
-   genre=${genre}&acoustic=${acoustic}&dance=${dance}&minyear=${minyear}&maxyear=${maxyear}`, {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/userinput?energy=${energy}&genre=${genre}&acoustic=${acoustic}&dance=${dance}&minyear=${minyear}&maxyear=${maxyear}`, {
        method: 'GET',
    })
    return res.json()
@@ -94,8 +92,7 @@ const userpopularTracks = async () => {
  
 //Route 8
 const getRecsDegrees = async (trackname, artistname) => {
-   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/degrees?trackname=${trackname}&
-   artistname=${artistname}`, {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/degrees?trackname=${trackname}&artistname=${artistname}`, {
        method: 'GET',
    })
    return res.json()
@@ -104,8 +101,7 @@ const getRecsDegrees = async (trackname, artistname) => {
  
 //Route 9
 const getRecsCharts = async (trackname, artistname) => {
-   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/charts?trackname=${trackname}&
-   artistname=${artistname}`, {
+   var res = await fetch(`http://${config.server_host}:${config.server_port}/recs/charts?trackname=${trackname}&artistname=${artistname}`, {
        method: 'GET',
    })
    return res.json()

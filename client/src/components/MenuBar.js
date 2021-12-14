@@ -10,26 +10,26 @@ import {
 class MenuBar extends React.Component {
     render() {
         return(
-            <Navbar type="dark" theme="primary" expand="md">
-        <NavbarBrand href="/">CIS 550 Final Project</NavbarBrand>
-          <Nav navbar>
-            <NavItem>
-              <NavLink active href="/analysis">
-                Analysis
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink active  href="/trends" >
-                Trends
-              </NavLink>
-            </NavItem>
-              <NavItem>
-                <NavLink active href="/recs" >
-                  Recs
-                </NavLink>
-              </NavItem>
-          </Nav>
-      </Navbar>
+            <Navbar type="light" theme="success" expand="md">
+              <NavbarBrand href="/">CIS 550 Final Project</NavbarBrand>
+              <Nav navbar>
+                <NavItem>
+                    <NavLink active href="/analysis">
+                    Analysis
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink active  href="/trends" >
+                    Trends
+                  </NavLink>
+                </NavItem>
+                  <NavItem>
+                    <NavLink active href="/recs" >
+                      Recs
+                    </NavLink>
+                  </NavItem>
+              </Nav>
+            </Navbar>
         )
     }
 }

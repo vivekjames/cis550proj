@@ -54,7 +54,7 @@ app.get('/getUserInput', routes.getUserInput);
 
 // Route 1 - register as GET 
 app.get('/analysis/getAvg', routes.getAvg)
- 
+
 // Route 2 - register as GET
 app.get('/trends/maxWeeks', routes.maxWeeks)
  

@@ -2,7 +2,7 @@ import React from 'react';
 
 import MenuBar from '../components/MenuBar';
 
-import { addToPlaylistTable, getUserData, getUserInput, getAvg} from '../fetcher'
+import { addToPlaylistTable, getUserData, getUserInput, getAvg, getTopGenre} from '../fetcher'
 
 
 class AnalysisPage extends React.Component {
@@ -17,13 +17,13 @@ class AnalysisPage extends React.Component {
             playlist: [],
             accessToken: urlParams.get('accessToken'),
             playlistMetaData: [],
-            popGenre: '',
+            topGenre: '',
             pop: [],
-            avgAcous: '',
-            avgDance: '',
-            avgEnergy: '',
-            avgInstr: '',
-            avgLive: '',
+            acous: [],
+            dance: [],
+            energy: [],
+            instr: [],
+            live: [],
         }
     }
 
@@ -41,25 +41,7 @@ class AnalysisPage extends React.Component {
             }
         }).then((results) => {
             results.json().then((playlist) => {
-                console.log(playlist.items);
-                var cleanedPlaylist = playlist.items.map((song) => {
-                    return {
-                        Artist: song.track.artists[0].name.replace('&', 'and'),
-                        Name: song.track.name.replace('&', 'and'),
-                        TrackId: song.track.id
-                    }
-                })
-                console.log(cleanedPlaylist)
-                this.setState({ playlist: cleanedPlaylist})
-                // for (var count = 0; count < cleanedPlaylist.length; count++) {
-                //     addToPlaylistTable(JSON.stringify(cleanedPlaylist[count])).then(res => {
-                //         console.log("added " + count);
-                //         console.log(res);
-                //     })
-                // }
-                getUserData().then(res => {
-                    console.log("created userInput");
-                    console.log(res);
+                if (typeof playlist.items === 'undefined') {
                     getUserInput().then(res => {
                         console.log("got userInput");
                         console.log(res);
@@ -71,25 +53,99 @@ class AnalysisPage extends React.Component {
                             } else {
                                 res.results[index].Genre = res.results[index].Genre + ', ' + res.results[count].Genre;
                                 res.results.splice(count, 1);
-                                count --;
+                                count--;
                             }
                         }
-                        this.setState({playlistMetaData: res.results});
-
-                        var numSongs = res.results.length;
-
-                        var avgPop = parseInt(res.results.reduce((total, next) => total + next.Popularity, 0) / numSongs, 10);
-                        var minPop = res.results.reduce((min, next) => min.Popularity < next.Popularity ? min : next, 1000).Popularity;
-                        var maxPop = res.results.reduce((max, next) => max.Popularity > next.Popularity ? max : next, 0).Popularity;
-                        
-                        this.setState({pop: [avgPop, minPop, maxPop]})
+                        this.setState({ playlistMetaData: res.results });
+                        this.setMeta(res);
                     })
-                })
+                    /*alert("Playlist could not be loaded");
+                    window.location = `/`;*/
+
+                } else {
+                    var cleanedPlaylist = playlist.items.map((song) => {
+                        return {
+                            Artist: song.track.artists[0].name.replace('&', 'and').replace('\'', '').replace('\"', '').replace('\\', ''),
+                            Name: song.track.name.replace('&', 'and').replace('\'', '').replace('\"', '').replace('\\', ''),
+                            TrackId: song.track.id
+                        }
+                    })
+                    console.log(cleanedPlaylist)
+                    this.setState({ playlist: cleanedPlaylist})
+
+                    // TODO uncomment for loop and getUserData()
+
+                    for (var count = 0; count < cleanedPlaylist.length; count++) {
+                        addToPlaylistTable(JSON.stringify(cleanedPlaylist[count])).then(res => {
+                            console.log("added " + count);
+                            console.log(res);
+                        })
+                    }
+                    getUserData().then(res => {
+                        console.log("created userInput");
+                        console.log(res);
+                    })
+                    getUserInput().then(res => {
+                        console.log("got userInput");
+                        console.log(res);
+                        var ids = [];
+                        for (let count = 0; count < res.results.length; count++) {
+                            var index = ids.indexOf(res.results[count].TrackId)
+                            if (index == -1) {
+                                ids.push(res.results[count].TrackId);
+                            } else {
+                                res.results[index].Genre = res.results[index].Genre + ', ' + res.results[count].Genre;
+                                res.results.splice(count, 1);
+                                count--;
+                            }
+                        }
+                        this.setState({ playlistMetaData: res.results });
+                        this.setMeta(res);
+                    })
+                }
+                
             })
         })
     }
 
-    
+    setMeta(res) {
+        getTopGenre().then(res => {
+            console.log(res);
+            this.setState({ topGenre: res.results[0].Genre })
+        })
+
+        var numSongs = res.results.length;
+
+        var avg = parseInt(res.results.reduce((total, next) => total + next.Popularity, 0) / numSongs, 10);
+        var min = res.results.reduce((min, next) => min.Popularity < next.Popularity ? min : next, 1000).Popularity;
+        var max = res.results.reduce((max, next) => max.Popularity > next.Popularity ? max : next, 0).Popularity;
+        this.setState({ pop: [avg, min, max] })
+
+        avg = Math.floor(res.results.reduce((total, next) => total + next.Acousticness, 0) / numSongs * 1000) / 1000;
+        min = res.results.reduce((min, next) => min.Acousticness < next.Acousticness ? min : next, 1000).Acousticness;
+        max = res.results.reduce((max, next) => max.Acousticness > next.Acousticness ? max : next, 0).Acousticness;
+        this.setState({ acous: [avg, min, max] })
+
+        avg = Math.floor(res.results.reduce((total, next) => total + next.Danceability, 0) / numSongs * 1000) / 1000;
+        min = res.results.reduce((min, next) => min.Danceability < next.Danceability ? min : next, 1000).Danceability;
+        max = res.results.reduce((max, next) => max.Danceability > next.Danceability ? max : next, 0).Danceability;
+        this.setState({ dance: [avg, min, max] })
+
+        avg = Math.floor(res.results.reduce((total, next) => total + next.Energy, 0) / numSongs * 1000) / 1000;
+        min = res.results.reduce((min, next) => min.Energy < next.Energy ? min : next, 1000).Energy;
+        max = res.results.reduce((max, next) => max.Energy > next.Energy ? max : next, 0).Energy;
+        this.setState({ energy: [avg, min, max] })
+
+        avg = Math.floor(res.results.reduce((total, next) => total + next.Instrumentalness, 0) / numSongs * 1000000) / 1000000;
+        min = res.results.reduce((min, next) => min.Instrumentalness < next.Instrumentalness ? min : next, 1000).Instrumentalness;
+        max = res.results.reduce((max, next) => max.Instrumentalness > next.Instrumentalness ? max : next, 0).Instrumentalness;
+        this.setState({ instr: [avg, min, max] })
+
+        avg = Math.floor(res.results.reduce((total, next) => total + next.Liveness, 0) / numSongs * 1000) / 1000;
+        min = res.results.reduce((min, next) => min.Liveness < next.Liveness ? min : next, 1000).Liveness;
+        max = res.results.reduce((max, next) => max.Liveness > next.Liveness ? max : next, 0).Liveness;
+        this.setState({ live: [avg, min, max] })
+    }
 
     render() {
         const headerStyle = {
@@ -105,43 +161,80 @@ class AnalysisPage extends React.Component {
             textAlign: 'center'
         }
 
+        const divStyle= {
+            marginLeft: 40
+        }
+
         return (
             <div style={{alignContent: 'center'}}>
                 {/* TODO add props to MenuBar */}
-                <MenuBar /> 
+                <MenuBar playlist={this.state.playlistID} accessToken={this.state.accessToken}/> 
                 <div style={{marginTop: 20, marginLeft: 20}}>
                     <h3> Analysis </h3>
-                    <div style={{display: 'flex', justifyContent: 'center', alignContent: 'center'}}>
+                    <div style={{display: 'flex', justifyContent: 'center', alignContent: 'center', marginTop: 40}}>
 
                         <div>
-                            <h4 style={headerStyle}> Genre </h4>
-                            <h5 style={avgStyle}> Avg: 100 </h5>
-                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                                <h6 style={mStyle}>Min: 20</h6>
-                                <h6>Max: 20</h6>
-                            </div>
+                            <h4 style={headerStyle}> Top Genre </h4>
+                            <h5 style={avgStyle}> {this.state.topGenre} </h5>
+                            
                         </div>
 
-                        <div style={{ marginLeft: 20 }}>
+                        <div style={divStyle}>
                             <h4 style={headerStyle}> Popularity </h4>
                             <h5 style={avgStyle}> Avg: {this.state.pop[0]} </h5>
                             <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                                <h6 style={mStyle}>Min: {this.state.pop[1]}</h6>
+                                <h6>Min: {this.state.pop[1]}</h6>
                                 <h6>Max: {this.state.pop[2]}</h6>
                             </div>
                         </div>
 
-                        <div style={{marginLeft: 20 }}>
-                            <h4 style={headerStyle}> Popularity </h4>
-                            <h5 style={avgStyle}> 100 </h5>
+                        <div style={divStyle}>
+                            <h4 style={headerStyle}> Acousticness </h4>
+                            <h5 style={avgStyle}> {this.state.acous[0]} </h5>
                             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                                <h6 style={mStyle}>20</h6>
-                                <h6>20</h6>
+                                <h6>{this.state.acous[1]}</h6>
+                                <h6>{this.state.acous[2]}</h6>
+                            </div>
+                        </div>
+
+                        <div style={divStyle}>
+                            <h4 style={headerStyle}> Danceability </h4>
+                            <h5 style={avgStyle}> {this.state.dance[0]} </h5>
+                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                                <h6>{this.state.dance[1]}</h6>
+                                <h6>{this.state.dance[2]}</h6>
+                            </div>
+                        </div>
+
+                        <div style={{width: 150, marginLeft: 40}}>
+                            <h4 style={headerStyle}> Energy </h4>
+                            <h5 style={avgStyle}> {this.state.energy[0]} </h5>
+                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                                <h6>{this.state.energy[1]}</h6>
+                                <h6>{this.state.energy[2]}</h6>
+                            </div>
+                        </div>
+
+                        <div style={divStyle}>
+                            <h4 style={headerStyle}> Instrumentalness </h4>
+                            <h5 style={avgStyle}> {this.state.instr[0]} </h5>
+                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                                <h6>{this.state.instr[1]}</h6>
+                                <h6>{this.state.instr[2]}</h6>
+                            </div>
+                        </div>
+
+                        <div style={divStyle}>
+                            <h4 style={headerStyle}> Liveness </h4>
+                            <h5 style={avgStyle}> {this.state.live[0]} </h5>
+                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                                <h6>{this.state.live[1]}</h6>
+                                <h6>{this.state.live[2]}</h6>
                             </div>
                         </div>
                         
                     </div>
-                    <table>
+                    <table style={{marginTop: 40, width: '100%'}}>
                         <thead>
                             <tr>
                                 <th>Artist</th>
