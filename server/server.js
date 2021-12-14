@@ -4,6 +4,7 @@ const mysql = require('mysql');
 
 const routes = require('./routes')
 const config = require('./config.json')
+const request = require('request');
 const cors = require('cors');
  
  
@@ -18,36 +19,38 @@ app.get('/testing', function(req, res) {
     res.json({message:'testing good'})
 })
 
-
-app.get('/login', function(req, res) {
-    
-    var state = "state";
-    
-    var scope = "playlist-read-public playlist-read-private";
-
-    const clientID = "20038c715a704136bd16ff016feeb3b9";
-    const redirect_uri = "http://localhost:3000/analysis/";
-    //res.json({ message: 'in login' });
-    res.redirect('https://accounts.spotify.com/authorize?response_type=code&client_id=20038c715a704136bd16ff016feeb3b9&scope=playlist-read-private&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fanalysis%2F&state=asdfghjklzxcvbnm');
-})
-
-app.get('/callback', function (req, res) {
-
+app.post('/getToken', function (req, res) {
+    var redirect_uri = 'http://localhost:3000/';
+        
+    console.log(req.query)
     var code = req.query.code || null;
+    var state = req.query.state || null;
 
-    var authOptions = {
+    request({
         url: 'https://accounts.spotify.com/api/token',
+        method: "POST",
         form: {
             code: code,
-            redirect_uri: redirect_uri,
-            grant_type: 'authorization_code'
+            redirect_uri: redirect_uri, 
+            grant_type: 'authorization_code',
+            client_id: '20038c715a704136bd16ff016feeb3b9',
+            client_secret: '4301f7a93c17480481f132b6eadc3b52'
         },
         headers: {
-            'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
-        },
+            //'Authorization': auth,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }, 
         json: true
-    };
+    }, function (error, response, data) {
+        //send the access token back to client
+        console.log(data)
+        res.send(data);
+    });
 });
+
+app.post('/addToPlaylistTable', routes.addToPlaylistTable);
+
+app.get('/getUserInput', routes.getUserInput);
 
 // Route 1 - register as GET 
 app.get('/analysis/getAvg', routes.getAvg)

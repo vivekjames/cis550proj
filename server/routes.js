@@ -11,6 +11,28 @@ const connection = mysql.createConnection({
    database: config.rds_db
 });
 connection.connect();
+
+async function addToPlaylistTable(req, res) {
+    console.log(req.query.track);
+    var track = JSON.parse(req.query.track)
+    connection.query('INSERT INTO Playlist VALUES (\'' + track.Artist + '\',\'' + track.Name + '\',\'' + track.TrackId + '\')',
+    function (error, results, fields) {
+        if(error) {
+            console.log(error)
+        }
+    });
+    res.json({message: "createPlaylist done"});
+}
+
+async function getUserInput(req, res) {
+    connection.query('SELECT * FROM userInput;', function (error, results, fields) {
+        if (error) {
+            console.log(error)
+        } else if (results) {
+            res.json({ results: results })
+        }
+    })
+}
  
 //Route 1
 async function getAvg(req, res){
@@ -114,14 +136,25 @@ async function songChars(req, res) {
  
   
 }
+
+
+
+// CREATE VIEW userInput AS
+// SELECT *
+//     FROM Playlist
+//        JOIN Tracks
+//        ON Playlist.TrackId = Tracks.TrackId;
  
 //Route 5
 async function userData (req, res){
-   connection.query(`CREATE VIEW userInput AS
-       SELECT *
-       FROM UserSongs
-       JOIN Tracks
-       ON UserSongs.TrackId = Tracks.TrackId;`, function (error, results, fields){
+    /*
+    connection.query(`CREATE VIEW userInput AS
+SELECT p.TrackId as TrackId, t.TrackName, t.ArtistName, t.Genre, t.Acousticness, t.Danceability, t.Energy,
+    t.Instrumentalness, t.Liveness, t.Loudness, t.Popularity, t.Speechiness, t.DurationMs, t.TimeSig, t.TrackKey,
+    t.TrackMode, t.Valence
+FROM Playlist p
+JOIN Tracks t
+ON p.TrackId = t.TrackId;`, function (error, results, fields){
            if(error){
                console.log(error)
                res.json({error: error})
@@ -129,7 +162,8 @@ async function userData (req, res){
            } else if (results){
                res.json({results : results})
            }
-       });
+       });*/
+    res.json({message: "good"});
 }
  
 // Route 6 (handler)
@@ -305,6 +339,8 @@ GROUP BY Genre) as g1`
  
  
 module.exports = {
+    addToPlaylistTable,
+    getUserInput,
    getAvg, 
    maxWeeks,
    avgPeakRankGenre,

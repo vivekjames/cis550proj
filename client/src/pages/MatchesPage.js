@@ -11,7 +11,7 @@ import {
 
 } from 'antd'
 
-import { getMatchSearch, getMatch } from '../fetcher'
+import { } from '../fetcher'
 
 
 import MenuBar from '../components/MenuBar';
@@ -33,7 +33,6 @@ class MatchesPage extends React.Component {
 
         this.handleAwayQueryChange = this.handleAwayQueryChange.bind(this)
         this.handleHomeQueryChange = this.handleHomeQueryChange.bind(this)
-        this.updateSearchResults = this.updateSearchResults.bind(this)
         this.goToMatch = this.goToMatch.bind(this)
 
     }
@@ -46,31 +45,13 @@ class MatchesPage extends React.Component {
 
     handleHomeQueryChange(event) {
         this.setState({ homeQuery: event.target.value })
-        // TASK 10: update state variables appropriately. See handleAwayQueryChange(event) for reference
 
     }
     goToMatch(matchId) {
         window.location = `/matches?id=${matchId}`
     }
 
-    updateSearchResults() {
-        //TASK 11: call getMatchSearch and update matchesResults in state. See componentDidMount() for a hint
-        getMatchSearch(this.state.homeQuery, this.state.awayQuery, null, null).then(res => {
-            this.setState({ matchesResults: res.results })
-        })
-    }
-
     componentDidMount() {
-        getMatchSearch(this.state.homeQuery, this.state.awayQuery, null, null).then(res => {
-            this.setState({ matchesResults: res.results })
-        })
-
-        getMatch(this.state.selectedMatchId).then(res => {
-            this.setState({ selectedMatchDetails: res.results[0] })
-        })
-
-
-
 
     }
 

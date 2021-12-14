@@ -7,9 +7,11 @@ import {
 } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
-import PlayersPage from './pages/PlayersPage';
 
 import AnalysisPage from './pages/AnalysisPage';
+import TrendsPage from './pages/TrendsPage';
+import RecsPage from './pages/RecsPage';
+
 
 import 'antd/dist/antd.css';
 
@@ -27,22 +29,21 @@ ReactDOM.render(
 							render={() => (
 								<HomePage />
 							)}/>
-        <Route exact
-							path="/players"
-							render={() => (
-								<PlayersPage />
-							)}/>
-        <Route exact
-							path="/matches"
-							render={() => (
-								<MatchesPage />
-							)}/>
 		<Route exact
 							path="/analysis"
 							render={() => (
 								<AnalysisPage />
-							)}
-		/>
+							)}/>
+		<Route exact
+							path="/trends"
+							render={() => (
+								<TrendsPage />
+							)} />
+		<Route exact
+							path="/recs"
+							render={() => (
+								<RecsPage />
+							)} />
       </Switch>
     </Router>
   </div>,

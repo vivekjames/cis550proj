@@ -13,14 +13,9 @@ class MenuBar extends React.Component {
             <Navbar type="dark" theme="primary" expand="md">
         <NavbarBrand href="/">CIS 550 Final Project</NavbarBrand>
           <Nav navbar>
-          <NavItem>
-              <NavLink active href="/">
-                Home
-              </NavLink>
-            </NavItem>
             <NavItem>
-              <NavLink active href="/players">
-                Players
+              <NavLink active href="/analysis">
+                Analysis
               </NavLink>
             </NavItem>
             <NavItem>

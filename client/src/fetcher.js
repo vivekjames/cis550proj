@@ -1,4 +1,34 @@
 import config from './config.json'
+
+
+const test = async () => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/testing`, {
+        method: 'GET',
+    })
+    return res.json()
+}
+
+const getToken = async (code) => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/getToken?code=${code}`, {
+        method: 'POST',
+    })
+    return res.json()
+}
+
+const addToPlaylistTable = async (track) => {
+    console.log(track)
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/addToPlaylistTable?track=${track}`, {
+        method: 'POST',
+    })
+    return res.json()
+}
+
+const getUserInput = async () => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/getUserInput`, {
+        method: 'GET',
+    })
+    return res.json()
+}
  
 //Route 1
 const getAvg = async (attribute) => {
@@ -30,21 +60,6 @@ const getSongChars = async (char1, char2, threshold1, threshold2) => {
        method: 'GET',
    })
    return res.json()
-}
- 
-const test = async () => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/testing`, {
-        method: 'GET',
-    })
-    return res.json()
-}
-
-const login = async () => {
-    console.log("IN FETCHER")
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/login`, {
-        method: 'GET',
-    })
-    return res.json()
 }
 
 //route 5
@@ -114,7 +129,9 @@ const getTopGenre = async () => {
  
 export {
     test,
-    login,
+    getToken,
+    addToPlaylistTable,
+    getUserInput,
     getAvg,
     getUserData, 
    getmaxWeeks, 
@@ -125,6 +142,4 @@ export {
    userpopularTracks,
    getSongChars, 
    getTopGenre
-   
- 
 }
