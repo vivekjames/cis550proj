@@ -2,8 +2,8 @@ import React from 'react';
 
 import MenuBar from '../components/MenuBar';
 
-
-import { addToPlaylistTable, getUserData } from '../fetcher'
+// TODO import methods from fetcher
+import { getmaxWeeks, getavgPeakRankGenre, getSongChars, userpopularTracks} from '../fetcher'
 
 
 class TrendsPage extends React.Component {
@@ -18,7 +18,7 @@ class TrendsPage extends React.Component {
     }
 
     componentDidMount() {
-        //TODO call fetcher methods and then set the state variables
+
     }
 
     //https://open.spotify.com/playlist/61YIZmXlbTDSasXwv4GNhG?si=cc11db4f32e14229

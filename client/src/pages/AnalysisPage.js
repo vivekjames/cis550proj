@@ -2,7 +2,7 @@ import React from 'react';
 
 import MenuBar from '../components/MenuBar';
 
-import { addToPlaylistTable, getUserData, getUserInput } from '../fetcher'
+import { addToPlaylistTable, getUserData, getUserInput, getAvg} from '../fetcher'
 
 
 class AnalysisPage extends React.Component {
@@ -16,7 +16,14 @@ class AnalysisPage extends React.Component {
             playlistID: urlParams.get('playlist'),
             playlist: [],
             accessToken: urlParams.get('accessToken'),
-            playlistMetaData: []
+            playlistMetaData: [],
+            popGenre: '',
+            pop: [],
+            avgAcous: '',
+            avgDance: '',
+            avgEnergy: '',
+            avgInstr: '',
+            avgLive: '',
         }
     }
 
@@ -56,20 +63,84 @@ class AnalysisPage extends React.Component {
                     getUserInput().then(res => {
                         console.log("got userInput");
                         console.log(res);
+                        var ids = [];
+                        for (let count = 0; count < res.results.length; count++) {
+                            var index = ids.indexOf(res.results[count].TrackId)
+                            if (index == -1) {
+                                ids.push(res.results[count].TrackId);
+                            } else {
+                                res.results[index].Genre = res.results[index].Genre + ', ' + res.results[count].Genre;
+                                res.results.splice(count, 1);
+                                count --;
+                            }
+                        }
                         this.setState({playlistMetaData: res.results});
+
+                        var numSongs = res.results.length;
+
+                        var avgPop = parseInt(res.results.reduce((total, next) => total + next.Popularity, 0) / numSongs, 10);
+                        var minPop = res.results.reduce((min, next) => min.Popularity < next.Popularity ? min : next, 1000).Popularity;
+                        var maxPop = res.results.reduce((max, next) => max.Popularity > next.Popularity ? max : next, 0).Popularity;
+                        
+                        this.setState({pop: [avgPop, minPop, maxPop]})
                     })
                 })
             })
         })
     }
 
+    
+
     render() {
+        const headerStyle = {
+            fontWeight: 'bold',
+            textAlign: 'center'
+        }
+
+        const avgStyle = {
+            textAlign: 'center'
+        }
+
+        const mStyle = {
+            textAlign: 'center'
+        }
+
         return (
             <div style={{alignContent: 'center'}}>
                 {/* TODO add props to MenuBar */}
                 <MenuBar /> 
                 <div style={{marginTop: 20, marginLeft: 20}}>
                     <h3> Analysis </h3>
+                    <div style={{display: 'flex', justifyContent: 'center', alignContent: 'center'}}>
+
+                        <div>
+                            <h4 style={headerStyle}> Genre </h4>
+                            <h5 style={avgStyle}> Avg: 100 </h5>
+                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                                <h6 style={mStyle}>Min: 20</h6>
+                                <h6>Max: 20</h6>
+                            </div>
+                        </div>
+
+                        <div style={{ marginLeft: 20 }}>
+                            <h4 style={headerStyle}> Popularity </h4>
+                            <h5 style={avgStyle}> Avg: {this.state.pop[0]} </h5>
+                            <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                <h6 style={mStyle}>Min: {this.state.pop[1]}</h6>
+                                <h6>Max: {this.state.pop[2]}</h6>
+                            </div>
+                        </div>
+
+                        <div style={{marginLeft: 20 }}>
+                            <h4 style={headerStyle}> Popularity </h4>
+                            <h5 style={avgStyle}> 100 </h5>
+                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                                <h6 style={mStyle}>20</h6>
+                                <h6>20</h6>
+                            </div>
+                        </div>
+                        
+                    </div>
                     <table>
                         <thead>
                             <tr>
@@ -78,9 +149,12 @@ class AnalysisPage extends React.Component {
                                 <th>Track ID</th>
                                 <th>Duration</th>
                                 <th>Genre</th>
+                                <th>Popularity</th>
                                 <th>Acousticness</th>
                                 <th>Danceability</th>
-                                <th>Popularity</th>
+                                <th>Energy</th>
+                                <th>Instrumentalness</th>
+                                <th>Liveness</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -92,9 +166,13 @@ class AnalysisPage extends React.Component {
                                         <td>{item.TrackId}</td>
                                         <td>{parseInt(parseInt(item.DurationMs) / 60000, 10) + ':' + parseInt(parseInt(item.DurationMs) % 60000 / 1000, 10)}</td>
                                         <td>{item.Genre}</td>
+                                        <td>{item.Popularity}</td>
                                         <td>{item.Acousticness}</td>
                                         <td>{item.Danceability}</td>
-                                        <td>{item.Popularity}</td>
+                                        <td>{item.Energy}</td>
+                                        <td>{item.Instrumentalness}</td>
+                                        <td>{item.Liveness}</td>
+                                        
                                     </tr>
                                 );
                             })}

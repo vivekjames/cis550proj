@@ -239,23 +239,27 @@ async function recs_degree(req, res) {
            WHERE Tracks.TrackName = '${track_name}' and Tracks.ArtistName = '${artist_name}'),
             one_degree(name, id, n, energy, artistname) as (
                 SELECT Tracks.TrackName, Tracks.TrackId, 1 as n, Tracks.Energy, Tracks.ArtistName
-                FROM Tracks, selected_song
-                WHERE Tracks.Genre = selected_song.GENRE AND Tracks.TrackName <> '${track_name}' AND Tracks.Energy = selected_song.Energy
+                FROM Tracks
+                INNER JOIN selected_song ON Tracks.Genre = selected_song.GENRE and Tracks.Energy = selected_song.Energy
+                WHERE Tracks.TrackName <> '${track_name}'
             ),
            two_degree(name, id, n, energy, artistname) as (
-              SELECT Tracks.TrackName, Tracks.TrackId, 2 as n, Tracks.Energy, Tracks.ArtistName
-                FROM Tracks, selected_song
-                WHERE Tracks.Genre = selected_song.GENRE AND Tracks.TrackName <> '${track_name}' AND
-                      Tracks.Energy < selected_song.Energy + 0.005 AND Tracks.Energy > selected_song.Energy - 0.005
-                       AND Tracks.TrackId NOT IN (SELECT id FROM one_degree)
+                SELECT Tracks.TrackName, Tracks.TrackId, 2 as n, Tracks.Energy, Tracks.ArtistName
+                FROM Tracks
+                INNER JOIN selected_song ON Tracks.Genre = selected_song.GENRE and
+                                            Tracks.Energy < selected_song.Energy + 0.005 AND
+                                            Tracks.Energy > selected_song.Energy - 0.005
+                WHERE Tracks.TrackName <> '${track_name}' AND Tracks.TrackId NOT IN (SELECT id FROM one_degree)   
             ),
            three_degree(name, id, n, energy, artistname) as (
                 SELECT Tracks.TrackName, Tracks.TrackId, 3 as n, Tracks.Energy, Tracks.ArtistName
-                FROM Tracks, selected_song
-                WHERE Tracks.Genre = selected_song.GENRE AND Tracks.TrackName <> '${track_name}' AND
-                      Tracks.Energy < selected_song.Energy + 0.008 AND Tracks.Energy > selected_song.Energy - 0.008
-                       AND Tracks.TrackId NOT IN (SELECT id FROM one_degree)
-                       AND Tracks.TrackId NOT IN (SELECT id FROM two_degree)
+                FROM Tracks
+                INNER JOIN selected_song ON Tracks.Genre = selected_song.GENRE and
+                                            Tracks.Energy < selected_song.Energy + 0.008 AND
+                                            Tracks.Energy > selected_song.Energy - 0.008
+                WHERE Tracks.TrackName <> '${track_name}'
+                        AND Tracks.TrackId NOT IN (SELECT id FROM one_degree)
+                        AND Tracks.TrackId NOT IN (SELECT id FROM two_degree)
             )
            SELECT artistname, name, id, n, energy
            FROM one_degree
