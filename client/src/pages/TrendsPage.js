@@ -182,7 +182,7 @@ class TrendsPage extends React.Component {
 
         userpopularTracks().then(res => {
             console.log('ok')
-            console.log(res.results)
+            console.log(res)
             this.setState({ userPopularTracksResults: res.results })
         })
     }

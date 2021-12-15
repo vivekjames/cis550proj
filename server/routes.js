@@ -204,14 +204,18 @@ async function recs_userinputs(req, res) {
  
 async function userpopularTracks(req, res) {
   
-   connection.query(`
-   with Charts1 as (
-       SELECT DISTINCT TrackName, TrackArtist, MIN(PeakRank) as PeakRank FROM Charts GROUP BY TrackName, TrackArtist
-   ), SELECT Charts1.TrackName, Charts1.TrackArtist, PeakRank, Popularity
-      FROM Charts1
-      INNER JOIN (SELECT TrackName, ArtistName, Popularity FROM userInput) usertracks
-      ON Charts1.TrackName = usertracks.Track AND Charts1.TrackArtist = usertracks.Artist
-      ORDER BY PeakRank;`, function (error, results, fields) {
+    connection.query(`SELECT DISTINCT Charts1.TrackName as Track, Charts1.TrackArtist as Artist, PeakRank, Popularity
+   FROM (SELECT DISTINCT TRACKName, TRACKArtist, MIN(PeakRank) as PeakRank
+   FROM Charts
+   Group By TRACKName, TRACKArtist
+   ) Charts1
+   INNER JOIN
+   (SELECT TrackName, ArtistName, Popularity
+   FROM userInput
+   ) usertracks
+   ON Charts1.TRACKName = usertracks.TrackName AND Charts1.TRACKArtist = usertracks.ArtistName
+   ORDER BY PeakRank;
+`, function (error, results, fields) {
       if (error) {
            console.log("hi")
            console.log(error)
