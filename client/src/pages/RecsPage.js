@@ -37,30 +37,25 @@ const degColumns = [
         title: 'Artist',
         dataIndex: 'artistname',
         key: 'artistname'
-        //sorter: (a, b) => a.Name.localeCompare(b.Name),
-        //render: (text, row) => <a href={`/players?id=${row.PlayerId}`}>{text}</a>
     },
     {
         title: 'Track',
         dataIndex: 'name',
         key: 'name'
-        //sorter: (a, b) => a.Nationality.localeCompare(b.Nationality)
     },
     {
         title: 'N Degree',
         dataIndex: 'n',
         key: 'n'
-        //sorter: (a, b) => a.Nationality.localeCompare(b.Nationality)
     },
     {
         title: 'Energy',
         dataIndex: 'energy',
         key: 'energy'
-        //sorter: (a, b) => a.Nationality.localeCompare(b.Nationality)
     }
 ]
 
-//Columns for the 
+//Columns for the Recommended Songs from the Charts Search
 const chartColumns = [
     {
         title: 'Track',
@@ -119,7 +114,7 @@ class RecsPage extends React.Component {
 
     }
 
-    //Route 6 
+    //Handle Event Changes for Route 6 - Returns list of songs given attributes
     handleGenreQueryChange(event) {
         this.setState({ genreQuery: event.target.value })
     }
@@ -142,7 +137,7 @@ class RecsPage extends React.Component {
         this.setState({ yearHighQuery: event.target.value })
     }
 
-
+    //Update results of attribute search returned by search button
     updateInputSearchResults() {
 
         getRecsUserInput(this.state.energyQuery, this.state.genreQuery, this.state.acousticQuery, this.state.danceQuery, this.state.yearLowQuery, this.state.yearHighQuery).then(res => {
@@ -151,7 +146,7 @@ class RecsPage extends React.Component {
         })
     }
 
-    //Route 8 
+    //Handle Event changes for Route 8 - Return songs 1, 2, 3 degrees away depending on the energy level
     handleTrackQueryChange(event) {
         this.setState({ trackNameQuery: event.target.value })
     }
@@ -160,13 +155,14 @@ class RecsPage extends React.Component {
         this.setState({ artistNameQuery: event.target.value })
     }
 
+    //Update deg results returned by search button
     updateDegSearchResults() {
         getRecsDegrees(this.state.trackNameQuery, this.state.artistNameQuery).then(res => {
             this.setState({ degResults: res.results })
         })
     }
 
-    //Route 9 
+    //Handle Event Route 9 - Return songs that also charted during same time as inputted song  
     handleChartSongQueryChange(event) {
         this.setState({ chartSongQuery: event.target.value })
     }
@@ -175,6 +171,7 @@ class RecsPage extends React.Component {
         this.setState({ chartArtistQuery: event.target.value })
     }
 
+    //Update song chart results returned by search button
     updateChartSearchResults() {
         getRecsCharts(this.state.chartSongQuery, this.state.chartArtistQuery).then(res => {
             console.log(res.results)
@@ -204,6 +201,7 @@ class RecsPage extends React.Component {
         return (
             <div style={{ alignContent: 'center' }}>
                 <MenuBar />
+                {/* Input fields for the Genre, Energy, Acousticness, Danceability attributes */}
                 <div style={{ marginTop: 20, marginLeft: 20 }}>
                     <h3 style={{ marginLeft: '5%' }}> Search For a Type of Song! </h3>
                 </div>
@@ -229,6 +227,7 @@ class RecsPage extends React.Component {
                     </Row>
                     <br></br>
                     <Row>
+                        {/* Input fields for the Minimum year, Maximum year attributes */}
                         <Col flex={2}><FormGroup style={{ width: '20vw', margin: '0 auto' }}>
                             <label>Minimum Year</label>
                             <FormInput placeholder="Minimum Year" value={this.state.yearLowQuery} onChange={this.handleYearLowQueryChange} />
@@ -237,8 +236,10 @@ class RecsPage extends React.Component {
                             <label>Maximum Year</label>
                             <FormInput placeholder="Maximum Year" value={this.state.yearHighQuery} onChange={this.handleYearHighQueryChange} />
                         </FormGroup></Col>
+                        {/* Search button, Route 6 */}
 
                         <Col flex={2}><FormGroup style={{ width: '10vw' }}>
+                             {/* Display results for Route 6 in a table */}
                             <Button style={{ marginTop: '4vh' }} onClick={this.updateInputSearchResults}>Search</Button>
                         </FormGroup></Col>
 
@@ -257,6 +258,7 @@ class RecsPage extends React.Component {
 
                 <Row>
                     <Col flex={2}><FormGroup style={{ width: '20vw', margin: '0 auto' }}>
+                        {/* Input fields for user's song and artist of choice */}
                         <label>Song Title</label>
                         <FormInput placeholder="Your song of choice" value={this.state.trackNameQuery} onChange={this.handleTrackQueryChange} />
                     </FormGroup></Col>
@@ -264,7 +266,7 @@ class RecsPage extends React.Component {
                         <label>Artist</label>
                         <FormInput placeholder="Your artist of choice" value={this.state.artistNameQuery} onChange={this.handleArtistQueryChange} />
                     </FormGroup></Col>
-
+                    {/* Search button - Route 8 */}
                     <Col flex={2}><FormGroup style={{ width: '10vw' }}>
                         <Button style={{ marginTop: '4vh' }} onClick={this.updateDegSearchResults}>Search</Button>
                     </FormGroup></Col>
@@ -272,6 +274,7 @@ class RecsPage extends React.Component {
                 </Row>
 
                 <Divider />
+                {/* Display results for Route 8 in a table */}
                 <Table dataSource={this.state.degResults} columns={degColumns} style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }} />
                 <Divider />
 
@@ -281,6 +284,7 @@ class RecsPage extends React.Component {
 
                 <Row>
                     <Col flex={2}><FormGroup style={{ width: '20vw', margin: '0 auto' }}>
+                        {/* Input fields for song and artist of choice */}
                         <label>Song Title</label>
                         <FormInput placeholder="Your song of choice" value={this.state.chartSongQuery} onChange={this.handleChartSongQueryChange} />
                     </FormGroup></Col>
@@ -288,7 +292,7 @@ class RecsPage extends React.Component {
                         <label>Artist</label>
                         <FormInput placeholder="Your artist of choice" value={this.state.chartArtistQuery} onChange={this.handleChartArtistQueryChange} />
                     </FormGroup></Col>
-
+                    {/* Search button - Route 9 */}
                     <Col flex={2}><FormGroup style={{ width: '10vw' }}>
                         <Button style={{ marginTop: '4vh' }} onClick={this.updateChartSearchResults}>Search</Button>
                     </FormGroup></Col>
@@ -296,6 +300,7 @@ class RecsPage extends React.Component {
                 </Row>
 
                 <Divider />
+                {/* Display results for Route 9 in a table */}
                 <Table dataSource={this.state.chartResults} columns={chartColumns} style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }} />
                 <Divider />
             </div>

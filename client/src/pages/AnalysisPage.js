@@ -33,6 +33,7 @@ class AnalysisPage extends React.Component {
 
     //https://open.spotify.com/playlist/61YIZmXlbTDSasXwv4GNhG?si=ed6a4e31874842a5
 
+    // Get the songs from the user's playlist
     getSongs() {
         var apiCall = 'https://api.spotify.com/v1/playlists/' + this.state.playlistID + '/tracks'
         fetch(apiCall, {
@@ -59,8 +60,6 @@ class AnalysisPage extends React.Component {
                         this.setState({ playlistMetaData: res.results });
                         this.setMeta(res);
                     })
-                    /*alert("Playlist could not be loaded");
-                    window.location = `/`;*/
 
                 } else {
                     var cleanedPlaylist = playlist.items.map((song) => {
@@ -73,7 +72,7 @@ class AnalysisPage extends React.Component {
                     console.log(cleanedPlaylist)
                     this.setState({ playlist: cleanedPlaylist})
 
-                    // TODO uncomment for loop and getUserData()
+
 
                     for (var count = 0; count < cleanedPlaylist.length; count++) {
                         addToPlaylistTable(JSON.stringify(cleanedPlaylist[count])).then(res => {
@@ -81,10 +80,12 @@ class AnalysisPage extends React.Component {
                             console.log(res);
                         })
                     }
+                    //Create the view depending on the playlist
                     getUserData().then(res => {
                         console.log("created userInput");
                         console.log(res);
                     })
+                    //Get data from the view
                     getUserInput().then(res => {
                         console.log("got userInput");
                         console.log(res);
@@ -115,7 +116,7 @@ class AnalysisPage extends React.Component {
         })
 
         var numSongs = res.results.length;
-
+        // Display the metadata of the songs from the user's playlist
         var avg = parseInt(res.results.reduce((total, next) => total + next.Popularity, 0) / numSongs, 10);
         var min = res.results.reduce((min, next) => min.Popularity < next.Popularity ? min : next, 1000).Popularity;
         var max = res.results.reduce((max, next) => max.Popularity > next.Popularity ? max : next, 0).Popularity;
@@ -167,7 +168,8 @@ class AnalysisPage extends React.Component {
 
         return (
             <div style={{alignContent: 'center'}}>
-                {/* TODO add props to MenuBar */}
+                {/* Display the top genre and average genre, popularity, acoustincess, danceability, 
+                instrumentalness, liveness */}
                 <MenuBar playlist={this.state.playlistID} accessToken={this.state.accessToken}/> 
                 <div style={{marginTop: 20, marginLeft: 20}}>
                     <h3> Analysis </h3>

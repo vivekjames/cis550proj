@@ -8,6 +8,7 @@ const test = async () => {
     return res.json()
 }
 
+// Get the Spotify Authorization Token
 const getToken = async (code) => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/getToken?code=${code}`, {
         method: 'POST',
@@ -15,6 +16,7 @@ const getToken = async (code) => {
     return res.json()
 }
 
+// Add user input playlist to the database
 const addToPlaylistTable = async (track) => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/addToPlaylistTable?track=${track}`, {
         method: 'POST',
@@ -22,6 +24,7 @@ const addToPlaylistTable = async (track) => {
     return res.json()
 }
 
+// Get the user inputted playlist
 const getUserInput = async () => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/getUserInput`, {
         method: 'GET',
@@ -37,7 +40,7 @@ const getAvg = async (attribute) => {
    return res.json()
 }
  
-//route 2
+//Route 2
 const getmaxWeeks = async () => {
    var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/maxWeeks`, {
        method: 'GET',
@@ -45,7 +48,7 @@ const getmaxWeeks = async () => {
    return res.json()
 }
  
-//route 3
+//Route 3
 const getavgPeakRankGenre = async () => {
    var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/avgPeakRankGenre`, {
        method: 'GET',
@@ -53,7 +56,7 @@ const getavgPeakRankGenre = async () => {
    return res.json()
 }
  
-//route 4
+//Route 4
 const getSongChars = async (char1, char2, threshold1, threshold2) => {
    var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/songChars?char1=${char1}&char2=${char2}&threshold1=${threshold1}&threshold2=${threshold2}`, {
        method: 'GET',
@@ -61,7 +64,7 @@ const getSongChars = async (char1, char2, threshold1, threshold2) => {
    return res.json()
 }
 
-//route 5
+//Route 5
 const getUserData = async () => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/analysis/userData`, {
         method: 'GET',
@@ -81,7 +84,7 @@ const getRecsUserInput = async (energy, genre, acoustic, dance, minyear, maxyear
 }
  
  
-//route 7 
+//Route 7 
 const userpopularTracks = async () => {
    var res = await fetch(`http://${config.server_host}:${config.server_port}/trends/userpopularTracks`, {
        method: 'GET',

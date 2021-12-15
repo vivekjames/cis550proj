@@ -2,7 +2,7 @@ const config = require('./config.json')
 const mysql = require('mysql');
 const e = require('express');
  
-// TODO: fill in your connection details here
+
 const connection = mysql.createConnection({
    host: config.rds_host,
    user: config.rds_user,
@@ -12,6 +12,7 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
+// Put the data from the user's playlist into the database
 async function addToPlaylistTable(req, res) {
     console.log(req.query.track);
     var track = JSON.parse(req.query.track)
@@ -24,6 +25,7 @@ async function addToPlaylistTable(req, res) {
     res.json({message: "createPlaylist done"});
 }
 
+// Get the playlist information about the playlist's metadata
 async function getUserInput(req, res) {
     connection.query('SELECT * FROM userInput;', function (error, results, fields) {
         if (error) {
@@ -35,6 +37,7 @@ async function getUserInput(req, res) {
 }
 
 //Route 1
+// Gets average attribute of playlist, with the attribute given by the user
 async function getAvg(req, res){
     const attrb = req.query.attribute
     connection.query('SELECT AVG(${attrb}) AS avg, MIN(${attrb}) as min, MAX(${attrb}) as max FROM userInput;',
@@ -48,8 +51,8 @@ async function getAvg(req, res){
  }
  
  
- 
-// Route 2 (handler)
+// Route 2 
+// Gets the maximum time a track from the playlist has spent on the charts, with the name of the track and artist.
 async function maxWeeks(req, res) {
   
        connection.query(`
@@ -71,8 +74,8 @@ async function maxWeeks(req, res) {
  
  
  
-//route 3
- 
+// Route 3
+// Gets the average Peak Rank on the charts per genre present in the playlist.
 async function avgPeakRankGenre(req, res) {
   
    connection.query(`
@@ -96,16 +99,15 @@ async function avgPeakRankGenre(req, res) {
    });
 }
  
-//route 4
+// Route 4
+// Gets all artists (along with their peak, weeks charted, average energy and danceability) with highly danceable and energetic music (on average) and orders the artists by their average peak rank and weeks on the charts. 
 async function songChars(req, res) {
  
    const char1 = req.query.char1 ? req.query.char1 : 'Danceability';
    const char2 = req.query.char1 ? req.query.char1 : 'Energy';
    const threshold1 = req.query.threshold1 ? req.query.threshold1 : '0.5';
    const threshold2 = req.query.threshold2 ? req.query.threshold2 : '0.5';
- 
- 
- 
+
  
        connection.query(`WITH DanceArtists as (
            select TrackArtist, AVG(PeakRank) as AVGPeak, AVG(WeeksOnBoard) as AVGWeeks, Avg(Danceability) as AVGChar2
@@ -138,14 +140,8 @@ async function songChars(req, res) {
 }
 
 
-
-// CREATE VIEW userInput AS
-// SELECT *
-//     FROM Playlist
-//        JOIN Tracks
-//        ON Playlist.TrackId = Tracks.TrackId;
- 
-//Route 5
+// Route 5
+// Join the user’s personal playlist, represented by UserSongs, with Tracks, in order to find the metadata for each of the songs in this playlist. Stores this in a view called ‘userInput.’
 async function userData (req, res){
     connection.query(`CREATE VIEW userInput AS
 SELECT p.TrackId as TrackId, t.TrackName, t.ArtistName, t.Genre, t.Acousticness, t.Danceability, t.Energy,
@@ -165,7 +161,8 @@ ON p.TrackId = t.TrackId;`, function (error, results, fields){
        });
 }
  
-// Route 6 (handler)
+// Route 6 
+// User selects an energy level (Def: High, Low), genre (Def: Pop), return from Tracks the songs that match this query, that is within the desired years. 
 async function recs_userinputs(req, res) {
    const energy = req.query.energy;
    const genre = req.query.genre;
@@ -200,8 +197,8 @@ async function recs_userinputs(req, res) {
    });
 }
  
-//route 7
- 
+// Route 7
+// We will find the most popular tracks on the user’s playlist according to whether they were on Billboard’s top charts, then order them by their popularity rating. 
 async function userpopularTracks(req, res) {
   
     connection.query(`SELECT DISTINCT Charts1.TrackName as Track, Charts1.TrackArtist as Artist, PeakRank, Popularity
@@ -229,7 +226,8 @@ async function userpopularTracks(req, res) {
 }
  
  
-// Route 8 (handler)
+// Route 8 
+// Given a song, gives songs that have the same energy (1 degree connection), are within .005 energy (2 degree connection) and are within .008 energy (3 degree connection). 
 async function recs_degree(req, res) {
   
    const track_name = req.query.trackname
@@ -283,7 +281,8 @@ async function recs_degree(req, res) {
 }
  
  
-// Route 9 (handler)
+// Route 9 
+// Returns song names, artists and ranks of songs that are the same genre and were on the Billboard Hot 100 at the same time as the given song/artist 
 async function recs_charts(req, res) {
   
    const track_name = req.query.trackname
@@ -321,6 +320,7 @@ async function recs_charts(req, res) {
 }
 
 // Route 10 
+// Return the most popular genre from the playlist
 async function topGenre(req, res) {
     connection.query(`
    SELECT Genre, MAX(mygenre) as TopGenre

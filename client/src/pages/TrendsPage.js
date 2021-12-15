@@ -16,6 +16,7 @@ import MenuBar from '../components/MenuBar';
 
 import { getmaxWeeks, getavgPeakRankGenre, getSongChars, userpopularTracks } from '../fetcher'
 
+// Gives the columns for the average characteristics given 2 thresholds
 const avgcolumns = [
     {
         title: 'Average Peak',
@@ -44,9 +45,9 @@ const avgcolumns = [
         sorter: (a, b) => a.Artist.localeCompare(b.Artist)
 
     }
-
 ];
 
+// Gives the columns for the song with the most number of weeks on Billboard
 const maxweekcolumns = [
     {
         title: 'Track Name',
@@ -71,6 +72,7 @@ const maxweekcolumns = [
 
 ];
 
+// Gives the columns for the average peak rank for each genre in the playlist
 const avgpeakcolumns = [
     {
         title: 'Average Peak Rank',
@@ -88,6 +90,7 @@ const avgpeakcolumns = [
 
 ];
 
+// Gives the columns for the track, artist, peak rank and popularity for user songs in the playlist
 const userpopularcolumns = [
     {
         title: 'Track Name',
@@ -145,6 +148,7 @@ class TrendsPage extends React.Component {
 
     }
 
+    //Handle Event Changes for Route 4 
     handleChar1Change(event) {
         this.setState({ char1: event.target.value })
     }
@@ -176,9 +180,6 @@ class TrendsPage extends React.Component {
             this.setState({ avgPeakRankGenreResults: res.results })
         })
 
-        /*getSongChars(this.state.char1, this.state.char2, this.state.threshold1, this.state.threshold2).then(res => {
-            this.setState({ songCharsResults: res.results })
-        })*/
 
         userpopularTracks().then(res => {
             console.log('ok')
@@ -187,12 +188,12 @@ class TrendsPage extends React.Component {
         })
     }
 
-    //https://open.spotify.com/playlist/61YIZmXlbTDSasXwv4GNhG?si=cc11db4f32e14229
 
+    
     render() {
         return (
             <div style={{ alignContent: 'center' }}>
-
+                {/* Prompts the user for 2 characteristics and thresholds*/}
                 <MenuBar />
                 <Form style={{ width: '80vw', margin: '0 auto', marginTop: '5vh' }}>
                     <h3>Averages Of 2 Characteristics Using Thresholds</h3>
@@ -218,25 +219,27 @@ class TrendsPage extends React.Component {
                         </FormGroup></Col>
                     </Row>
 
-
+                {/* Returns the artists have average of the given the characteristics that are greater than
+                the given thresholds*/}
                 </Form>
                 <Divider />
                 <Table dataSource={this.state.songCharsResults} columns={avgcolumns} style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }} />
 
+                {/* Returns the song with the max number of weeks on Billboard Hot 100*/}
                 <Divider />
                 <h3 style={{paddingLeft: '10%'}}>Max Week for Tracks on Your Playlist</h3>
 
                 <Table dataSource={this.state.maxWeeksResults} columns={maxweekcolumns} style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }} />
 
                 <Divider />
-
+                {/* Returns average peak rank of the genres of the user given playlist*/}
                 <Divider />
                 <h3 style={{ paddingLeft: '10%' }}>Average Peak of Each Genre</h3>
 
                 <Table dataSource={this.state.avgPeakRankGenreResults} columns={avgpeakcolumns} style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }} />
 
                 <Divider />
-
+                {/* Returns the songs in the user given playlist that are in the Billboard Hot 100*/}
                 <Divider />
                 <h3 style={{ paddingLeft: '10%' }}>Rank Popular Tracks on Your Playlist</h3>
 
